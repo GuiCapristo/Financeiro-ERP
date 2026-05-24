@@ -39,6 +39,7 @@ O sistema permite o gerenciamento de transações financeiras, incluindo contas 
 
 ## Estrutura do Projeto
 
+```
 app/
 ├── main.py
 ├── core/
@@ -55,7 +56,7 @@ app/
 tests/
 ├── test_financeiro.py
 requirements.txt
-
+```
 
 ---
 
