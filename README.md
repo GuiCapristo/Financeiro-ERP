@@ -89,23 +89,30 @@ venv\Scripts\activate
 Linux / macOS
 
 source venv/bin/activate
+
 4. Instalar dependências
 pip install -r requirements.txt
+
 5. Executar a aplicação
 uvicorn app.main:app --reload
+
 Documentação da API
 
 Após iniciar o servidor, a documentação interativa estará disponível em:
 
 Swagger UI: http://127.0.0.1:8000/docs
 ReDoc: http://127.0.0.1:8000/redoc
+
 Testes
 
 Para executar os testes automatizados:
 
 pytest
+
 Endpoints Principais
+
 Método	Endpoint	Descrição
+
 GET	/financeiro/contas-pagar	Lista contas a pagar
 POST	/financeiro/contas-pagar	Cria conta a pagar
 GET	/financeiro/contas-receber	Lista contas a receber
@@ -113,13 +120,15 @@ POST	/financeiro/contas-receber	Cria conta a receber
 GET	/financeiro/fluxo-caixa	Retorna o fluxo de caixa
 GET	/financeiro/contas-vencidas	Lista contas vencidas
 PATCH	/financeiro/contas/{id}/pagar	Marca conta como paga
-Regras de Negócio
+
+RRegras de Negócio
 Transações do tipo "entrada" aumentam o saldo
 Transações do tipo "saida" reduzem o saldo
 Uma conta é considerada vencida quando:
 A data de vencimento é anterior à data atual
 O status é "pendente"
 Apenas transações pendentes podem ser marcadas como pagas
+
 Autores
 Seu Nome
 Nome dos integrantes do grupo
