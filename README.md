@@ -194,8 +194,7 @@ O módulo foi projetado para funcionar como um serviço independente, sendo cons
 
 ## Autores
 
-- Guilherme Capristo  
-- Integrantes do grupo  
+- Guilherme Capristo   
 
 ---
 
