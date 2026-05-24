@@ -1,12 +1,43 @@
-# Módulo Financeiro - ERP com FastAPI
+# Financeiro-ERP — Módulo Financeiro (API FastAPI)
 
-Este projeto foi desenvolvido como parte da disciplina de **Programação de Sistemas Distribuídos**, com o objetivo de implementar um módulo financeiro de um sistema ERP utilizando a framework **FastAPI**.
+Este repositório contém o módulo Financeiro de um ERP universitário. Ele é um serviço independente responsável pelo gerenciamento de contas a pagar, contas a receber e fluxo de caixa, expondo uma API FastAPI para consumo pelo Core e outros módulos via HTTP.
 
 ---
 
-## Visão Geral
+## Estrutura do projeto
 
-O sistema permite o gerenciamento de transações financeiras, incluindo contas a pagar, contas a receber e cálculo de fluxo de caixa, seguindo boas práticas de organização em camadas (routers, services, repositories e schemas).
+```
+Financeiro-ERP/
+├── README.md
+├── .gitignore
+├── requirements.txt
+└── app/
+    ├── main.py
+    ├── core/
+    ├── models/
+    │   └── transacao.py
+    ├── schemas/
+    │   └── transacao_schema.py
+    ├── repositories/
+    │   └── transacao_repository.py
+    ├── services/
+    │   └── transacao_service.py
+    └── routers/
+        └── financeiro_router.py
+
+tests/
+└── test_financeiro.py
+```
+
+---
+
+## Stack
+
+- FastAPI
+- Uvicorn
+- Pydantic
+- Python 3.11+
+- pytest
 
 ---
 
@@ -21,117 +52,153 @@ O sistema permite o gerenciamento de transações financeiras, incluindo contas 
 - Listagem de contas a receber
 
 ### Fluxo de Caixa
-- Cálculo consolidado de:
-  - Total de entradas
-  - Total de saídas
-  - Saldo final
+- Cálculo de entradas
+- Cálculo de saídas
+- Saldo consolidado
 
 ### Contas Vencidas
-- Identificação de contas vencidas com status pendente
+- Listagem de contas vencidas não pagas
 
-### Pagamento de Contas
-- Atualização do status de transações para "pago"
+### Pagamentos
+- Marcar contas como pagas
 
-### Consulta de Transações
-- Busca de transações por identificador único (UUID)
-
----
-
-## Estrutura do Projeto
-
-```
-app/
-├── main.py
-├── core/
-├── models/
-│ └── transacao.py
-├── schemas/
-│ └── transacao_schema.py
-├── repositories/
-│ └── transacao_repository.py
-├── services/
-│ └── transacao_service.py
-├── routers/
-│ └── financeiro_router.py
-tests/
-├── test_financeiro.py
-requirements.txt
-```
+### Consulta
+- Buscar transação por ID
 
 ---
 
-## Tecnologias Utilizadas
+## Modelo de dados
 
-- Python 3.11+
-- FastAPI
-- Pydantic
-- Pytest
+### Transação
+
+Campos principais:
+
+- id
+- descricao
+- valor
+- tipo (entrada ou saída)
+- data_vencimento
+- status (pendente ou pago)
 
 ---
 
-## Execução do Projeto
+## Como rodar o projeto
 
-### 1. Clonar o repositório
+### 1) Clonar o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/modulo-financeiro.git
-cd modulo-financeiro
+git clone https://github.com/GuiCapristo/Financeiro-ERP
+cd Financeiro-ERP
+```
 
-2. Criar ambiente virtual
+### 2) Criar ambiente virtual
+
+```bash
 python -m venv venv
+```
 
-3. Ativar o ambiente virtual
+### 3) Ativar o ambiente
 
-Windows
+Windows:
 
+```bash
 venv\Scripts\activate
+```
 
-Linux / macOS
+Linux/macOS:
 
+```bash
 source venv/bin/activate
+```
 
-4. Instalar dependências
+### 4) Instalar dependências
+
+```bash
 pip install -r requirements.txt
+```
 
-5. Executar a aplicação
-uvicorn app.main:app --reload
+### 5) Executar a API
 
-Documentação da API
+```bash
+uvicorn app.main:app --reload --port 8002
+```
 
-Após iniciar o servidor, a documentação interativa estará disponível em:
+Acessos:
 
-Swagger UI: http://127.0.0.1:8000/docs
-ReDoc: http://127.0.0.1:8000/redoc
+- http://localhost:8002/docs
+- http://localhost:8002/redoc
 
-Testes
+---
 
-Para executar os testes automatizados:
+## Endpoints
 
+Todas as rotas estão sob /financeiro.
+
+### Contas a pagar
+
+- GET /financeiro/contas-pagar
+- POST /financeiro/contas-pagar
+
+### Contas a receber
+
+- GET /financeiro/contas-receber
+- POST /financeiro/contas-receber
+
+### Fluxo de caixa
+
+- GET /financeiro/fluxo-caixa
+
+### Contas vencidas
+
+- GET /financeiro/contas-vencidas
+
+### Pagamento
+
+- PATCH /financeiro/contas/{id}/pagar
+
+---
+
+## Regras de negócio
+
+- Transações do tipo entrada aumentam o saldo
+- Transações do tipo saída diminuem o saldo
+- Contas vencidas são aquelas com:
+  - data_vencimento menor que a data atual
+  - status igual a pendente
+- Apenas contas pendentes podem ser marcadas como pagas
+
+---
+
+## Armazenamento de dados
+
+Atualmente os dados são armazenados em memória:
+
+- São perdidos ao reiniciar a aplicação
+- Não há persistência em banco de dados nesta versão
+
+---
+
+## Testes
+
+```bash
 pytest
+```
 
-Endpoints Principais
+---
 
-Método	Endpoint	Descrição
+## Integração com o Core
 
-GET	/financeiro/contas-pagar	Lista contas a pagar
-POST	/financeiro/contas-pagar	Cria conta a pagar
-GET	/financeiro/contas-receber	Lista contas a receber
-POST	/financeiro/contas-receber	Cria conta a receber
-GET	/financeiro/fluxo-caixa	Retorna o fluxo de caixa
-GET	/financeiro/contas-vencidas	Lista contas vencidas
-PATCH	/financeiro/contas/{id}/pagar	Marca conta como paga
+O módulo foi projetado para funcionar como um serviço independente, sendo consumido pelo Core via HTTP.
 
-RRegras de Negócio
-Transações do tipo "entrada" aumentam o saldo
-Transações do tipo "saida" reduzem o saldo
-Uma conta é considerada vencida quando:
-A data de vencimento é anterior à data atual
-O status é "pendente"
-Apenas transações pendentes podem ser marcadas como pagas
+---
 
-Autores
-Seu Nome
-Nome dos integrantes do grupo
-Observações
+## Autores
 
-O sistema utiliza armazenamento em memória (lista em Python), não havendo persistência de dados após reinicialização da aplicação.
+- Guilherme Capristo  
+- Integrantes do grupo  
+
+---
+
+## Observações
+
+Este projeto foi desenvolvido para fins acadêmicos, com foco em arquitetura modular e separação de responsabilidades em sistemas distribuídos.
