@@ -219,7 +219,7 @@ O módulo foi projetado para funcionar como um serviço independente, sendo cons
 
 ## Autores
 
-- [Guilherme Henrique Celistrino Capristo](https://github.com/GuiCapristo)
+- [Guilherme Capristo](https://github.com/GuiCapristo)
 - [Marcos Vinicius](https://github.com/marcosvinicius-tech)
 
 ---
