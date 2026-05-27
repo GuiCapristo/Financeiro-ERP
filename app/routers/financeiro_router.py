@@ -6,7 +6,8 @@ from app.schemas.transacao_schema import (
     TransacaoCreate,
     ContaPagar,
     ContaReceber,
-    TipoTransacao
+    TipoTransacao,
+    StatusTransacao
 )
 
 from app.services.transacao_service import (
@@ -19,48 +20,56 @@ from app.services.transacao_service import (
 
 router = APIRouter(prefix="/financeiro", tags=["Financeiro"])
 
+
 @router.get("/contas-pagar")
 def listar_contas_pagar():
     return [
         t for t in listar_transacoes()
-        if t.tipo == TipoTransacao.saida
+        if t["tipo"] == TipoTransacao.saida
     ]
+
 
 @router.post("/contas-pagar")
 def criar_conta_pagar(conta: ContaPagar):
     transacao = TransacaoCreate(
-        **conta.dict(),
+        **conta.model_dump(),
         tipo=TipoTransacao.saida
     )
     return criar_transacao(transacao)
+
 
 @router.get("/contas-receber")
 def listar_contas_receber():
     return [
         t for t in listar_transacoes()
-        if t.tipo == TipoTransacao.entrada
+        if t["tipo"] == TipoTransacao.entrada
     ]
+
 
 @router.post("/contas-receber")
 def criar_conta_receber(conta: ContaReceber):
     transacao = TransacaoCreate(
-        **conta.dict(),
+        **conta.model_dump(),
         tipo=TipoTransacao.entrada
     )
     return criar_transacao(transacao)
+
 
 @router.get("/fluxo-caixa")
 def fluxo_caixa():
     return calcular_fluxo_caixa()
 
+
 @router.get("/contas-vencidas")
 def contas_vencidas():
     hoje = date.today()
+    resultado = []
+    for t in listar_transacoes():
+        t_data = date.fromisoformat(t["data_vencimento"]) if isinstance(t["data_vencimento"], str) else t["data_vencimento"]
+        if t_data < hoje and t["status"] == StatusTransacao.pendente:
+            resultado.append(t)
+    return resultado
 
-    return [
-        t for t in listar_transacoes()
-        if t.data_vencimento < hoje and t.status == "pendente"
-    ]
 
 @router.get("/contas/{transacao_id}")
 def obter_transacao(transacao_id: UUID):
@@ -73,6 +82,7 @@ def obter_transacao(transacao_id: UUID):
         )
 
     return transacao
+
 
 @router.patch("/contas/{transacao_id}/pagar")
 def marcar_como_pago(transacao_id: UUID):
