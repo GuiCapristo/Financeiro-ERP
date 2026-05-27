@@ -1,6 +1,6 @@
 # Financeiro-ERP — Módulo Financeiro (API FastAPI)
 
-Este repositório contém o módulo Financeiro de um ERP universitário. Ele é um serviço independente responsável pelo gerenciamento de contas a pagar, contas a receber e fluxo de caixa, expondo uma API FastAPI para consumo pelo Core e outros módulos via HTTP.
+Este repositório contém o módulo Financeiro de um ERP universitário. Ele é um serviço independente responsável pelo gerenciamento de contas a pagar, contas a receber e fluxo de caixa, expondo uma API FastAPI para consumo pelo Core e outros módulos via HTTP. Inclui também um Dashboard visual para apresentação dos dados.
 
 ---
 
@@ -11,9 +11,11 @@ Financeiro-ERP/
 ├── README.md
 ├── .gitignore
 ├── requirements.txt
+├── seed_data.py
 └── app/
     ├── main.py
     ├── core/
+    │   └── database.py
     ├── models/
     │   └── transacao.py
     ├── schemas/
@@ -22,10 +24,14 @@ Financeiro-ERP/
     │   └── transacao_repository.py
     ├── services/
     │   └── transacao_service.py
-    └── routers/
-        └── financeiro_router.py
+    ├── routers/
+    │   └── financeiro_router.py
+    └── static/
+        └── index.html
 
 tests/
+├── __init__.py
+├── pytest.ini
 └── test_financeiro.py
 ```
 
@@ -36,6 +42,8 @@ tests/
 - FastAPI
 - Uvicorn
 - Pydantic
+- SQLAlchemy (ORM para banco de dados)
+- SQLite (banco de dados)
 - Python 3.11+
 - pytest
 
@@ -64,6 +72,11 @@ tests/
 
 ### Consulta
 - Buscar transação por ID
+
+### Dashboard
+- Interface visual para visualização dos dados
+- Cards com totais de entradas, saídas e saldo
+- Tabela com todas as transações
 
 ---
 
@@ -117,7 +130,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 5) Executar a API
+### 5) (Opcional) Adicionar dados de exemplo
+
+```bash
+python seed_data.py
+```
+
+### 6) Executar a API
 
 ```bash
 uvicorn app.main:app --reload --port 8002
@@ -125,8 +144,9 @@ uvicorn app.main:app --reload --port 8002
 
 Acessos:
 
-- http://localhost:8002/docs
-- http://localhost:8002/redoc
+- Dashboard (visual): http://localhost:8002
+- Documentação Swagger: http://localhost:8002/docs
+- Documentação Redoc: http://localhost:8002/redoc
 
 ---
 
@@ -156,6 +176,10 @@ Todas as rotas estão sob /financeiro.
 
 - PATCH /financeiro/contas/{id}/pagar
 
+### Consulta por ID
+
+- GET /financeiro/contas/{id}
+
 ---
 
 ## Regras de negócio
@@ -171,17 +195,18 @@ Todas as rotas estão sob /financeiro.
 
 ## Armazenamento de dados
 
-Atualmente os dados são armazenados em memória:
+Os dados são armazenados em banco de dados SQLite:
 
-- São perdidos ao reiniciar a aplicação
-- Não há persistência em banco de dados nesta versão
+- Persistentes (não são perdidos ao reiniciar
+- Arquivo `financeiro.db` criado na raiz do projeto
+- ORM SQLAlchemy para manipulação dos dados
 
 ---
 
 ## Testes
 
 ```bash
-pytest
+python -m pytest tests/ -v
 ```
 
 ---
@@ -194,7 +219,8 @@ O módulo foi projetado para funcionar como um serviço independente, sendo cons
 
 ## Autores
 
-- Guilherme Capristo   
+- Guilherme Capristo
+- Marcos Vinícius
 
 ---
 
